@@ -3,12 +3,14 @@
 #include <list>
 #include "epdgui.h"
 
+/***************************************************************************************/
 typedef struct
 {
     Frame_Base* frame;
     epdgui_args_vector_t args;
-}frame_struct_t;
+} frame_struct_t;
 
+/***************************************************************************************/
 std::list<EPDGUI_Base*> epdgui_object_list;
 uint32_t obj_id = 1;
 Frame_Base* wait_for_delete = NULL;
@@ -18,6 +20,7 @@ uint8_t frame_switch_count = 0;
 bool _is_auto_update = true;
 uint16_t _last_pos_x = 0xFFFF, _last_pos_y = 0xFFFF;
 
+/***************************************************************************************/
 void EPDGUI_AddObject(EPDGUI_Base* object)
 {
     object->SetID(obj_id);
@@ -25,6 +28,7 @@ void EPDGUI_AddObject(EPDGUI_Base* object)
     epdgui_object_list.push_back(object);
 }
 
+/***************************************************************************************/
 void EPDGUI_Draw(m5epd_update_mode_t mode)
 {
     for(std::list<EPDGUI_Base*>::iterator p = epdgui_object_list.begin(); p != epdgui_object_list.end(); p++)
@@ -33,6 +37,7 @@ void EPDGUI_Draw(m5epd_update_mode_t mode)
     }
 }
 
+/***************************************************************************************/
 void EPDGUI_Process(void)
 {
     for(std::list<EPDGUI_Base*>::iterator p = epdgui_object_list.begin(); p != epdgui_object_list.end(); p++)
@@ -41,6 +46,7 @@ void EPDGUI_Process(void)
     }
 }
 
+/***************************************************************************************/
 void EPDGUI_Process(int16_t x, int16_t y)
 {
     for(std::list<EPDGUI_Base*>::iterator p = epdgui_object_list.begin(); p != epdgui_object_list.end(); p++)
@@ -50,11 +56,13 @@ void EPDGUI_Process(int16_t x, int16_t y)
     }
 }
 
+/***************************************************************************************/
 void EPDGUI_Clear(void)
 {
     epdgui_object_list.clear();
 }
 
+/***************************************************************************************/
 void EPDGUI_Run(Frame_Base* frame)
 {
     uint32_t last_active_time = 0;
@@ -138,6 +146,7 @@ void EPDGUI_Run(Frame_Base* frame)
     }
 }
 
+/***************************************************************************************/
 void EPDGUI_MainLoop(void)
 {
     if((!frame_stack.empty()) && (frame_stack.top() != NULL))
@@ -151,6 +160,7 @@ void EPDGUI_MainLoop(void)
     }
 }
 
+/***************************************************************************************/
 void EPDGUI_AddFrame(String name, Frame_Base* frame)
 {
     frame_struct_t f;
@@ -158,6 +168,7 @@ void EPDGUI_AddFrame(String name, Frame_Base* frame)
     frame_map.insert(std::pair<String, frame_struct_t>(name, f));
 }
 
+/***************************************************************************************/
 void EPDGUI_AddFrameArg(String name, int n, void* arg)
 {
     if(frame_map.count(name) == 0)
@@ -175,6 +186,7 @@ void EPDGUI_AddFrameArg(String name, int n, void* arg)
     log_d("%d", frame_map[name].args.size());
 }
 
+/***************************************************************************************/
 Frame_Base* EPDGUI_GetFrame(String name)
 {
     if(frame_map.count(name) > 0)
@@ -184,11 +196,13 @@ Frame_Base* EPDGUI_GetFrame(String name)
     return NULL;
 }
 
+/***************************************************************************************/
 void EPDGUI_PushFrame(Frame_Base* frame)
 {
     frame_stack.push(frame);
 }
 
+/***************************************************************************************/
 void EPDGUI_PopFrame(bool isDelete)
 {
     if(isDelete)
@@ -198,6 +212,7 @@ void EPDGUI_PopFrame(bool isDelete)
     frame_stack.pop();
 }
 
+/***************************************************************************************/
 void EPDGUI_OverwriteFrame(Frame_Base* frame)
 {
     while(!frame_stack.empty())
@@ -207,6 +222,7 @@ void EPDGUI_OverwriteFrame(Frame_Base* frame)
     frame_stack.push(frame);
 }
 
+/***************************************************************************************/
 void EPDGUI_SetAutoUpdate(bool isAuto)
 {
     _is_auto_update = isAuto;

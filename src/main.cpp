@@ -3,6 +3,7 @@
 #include "frame/frame.h"
 #include "systeminit.h"
 
+/***************************************************************************************/
 void setup()
 {
     pinMode(M5EPD_MAIN_PWR_PIN, OUTPUT);
@@ -11,7 +12,7 @@ void setup()
     SysInit_Start();
 }
 
-
+/***************************************************************************************/
 void loop()
 {
     EPDGUI_MainLoop();

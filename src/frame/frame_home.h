@@ -21,7 +21,7 @@ private:
     EPDGUI_Button *_key_air_1_plus;
     EPDGUI_Button *_key_air_1_minus;
     EPDGUI_Button *_key_air_2_plus;
-    EPDGUI_Button *_key_air_2_minus;
+    EPDGUI_Button *_key_air_2_minus;    
 };
 
 #endif //_FRAME_HOME_H_

@@ -1,5 +1,6 @@
 #include "epdgui_switch.h"
 
+/******************************************************************************************************/
 EPDGUI_Switch::EPDGUI_Switch(int16_t state_num, int16_t x, int16_t y, int16_t w, int16_t h): 
 EPDGUI_Base(x, y, w, h)
 {
@@ -23,6 +24,7 @@ EPDGUI_Base(x, y, w, h)
     _canvas_pressed->fillCanvas(15);
 }
 
+/******************************************************************************************************/
 EPDGUI_Switch::~EPDGUI_Switch()
 {
     for(int i = 0; i < _state_num; i++)
@@ -31,6 +33,7 @@ EPDGUI_Switch::~EPDGUI_Switch()
     }
 }
 
+/******************************************************************************************************/
 M5EPD_Canvas* EPDGUI_Switch::Canvas(int16_t state)
 {
     if(state == -1)
@@ -40,6 +43,7 @@ M5EPD_Canvas* EPDGUI_Switch::Canvas(int16_t state)
     return _canvas[state];
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::SetLabel(int16_t state, String label)
 {
     if(state > EPDGUI_SWITCH_MAX_STATE || state < 0)
@@ -57,6 +61,7 @@ void EPDGUI_Switch::SetLabel(int16_t state, String label)
     this->_label_array[state] = label;
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::Draw(m5epd_update_mode_t mode)
 {
     if(_ishide)
@@ -73,6 +78,7 @@ void EPDGUI_Switch::Draw(m5epd_update_mode_t mode)
     this->_canvas[_state]->pushCanvas(_x, _y, mode);
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::Draw(M5EPD_Canvas* canvas)
 {
     if(_ishide)
@@ -89,6 +95,7 @@ void EPDGUI_Switch::Draw(M5EPD_Canvas* canvas)
     this->_canvas[_state]->pushToCanvas(_x, _y, canvas);
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::Bind(int16_t state, void (* func_cb)(epdgui_args_vector_t&))
 {
     if(state > EPDGUI_SWITCH_MAX_STATE || state < 0)
@@ -99,6 +106,7 @@ void EPDGUI_Switch::Bind(int16_t state, void (* func_cb)(epdgui_args_vector_t&))
     this->_func_cb_array[state] = func_cb;
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::UpdateState(int16_t x, int16_t y)
 {
     if(!_isenable || _ishide)
@@ -136,6 +144,7 @@ void EPDGUI_Switch::UpdateState(int16_t x, int16_t y)
     }
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::setState(int16_t state)
 {
     if(state >= _state_num || state < 0)
@@ -146,11 +155,13 @@ void EPDGUI_Switch::setState(int16_t state)
     Draw(UPDATE_MODE_NONE);
 }
 
+/******************************************************************************************************/
 int16_t EPDGUI_Switch::getState(void)
 {
     return _state;
 }
 
+/******************************************************************************************************/
 void EPDGUI_Switch::AddArgs(int16_t state, uint16_t n, void* arg)
 {
     if(state > EPDGUI_SWITCH_MAX_STATE || state < 0)
@@ -167,3 +178,13 @@ void EPDGUI_Switch::AddArgs(int16_t state, uint16_t n, void* arg)
         this->_func_cb_param_array[state].push_back(arg);
     }
 }
+
+
+
+
+
+
+
+
+
+

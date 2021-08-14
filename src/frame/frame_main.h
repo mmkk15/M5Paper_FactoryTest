@@ -1,8 +1,12 @@
 #ifndef _FRAME_MAIN_H_
 #define _FRAME_MAIN_H_
 
+/******************************************************************************************************************/
 #include "frame_base.h"
 
+#define NUMBER_OF_KEYS 12
+
+/******************************************************************************************************************/
 class Frame_Main : public Frame_Base
 {
 public:
@@ -14,7 +18,7 @@ public:
     void AppName(m5epd_update_mode_t mode);
 
 private:
-    EPDGUI_Button *_key[8];
+    EPDGUI_Button *_key[NUMBER_OF_KEYS];
     M5EPD_Canvas *_bar;
     M5EPD_Canvas *_names;
     uint32_t _next_update_time;

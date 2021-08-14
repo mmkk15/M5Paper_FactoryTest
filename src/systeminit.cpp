@@ -1,3 +1,5 @@
+/***************************************************************************************/
+/*** Includes ***/
 #include "systeminit.h"
 #include "epdgui/epdgui.h"
 #include "frame/frame.h"
@@ -6,8 +8,10 @@
 #include "resources/binaryttf.h"
 #include <WiFi.h>
 
+/***************************************************************************************/
 QueueHandle_t xQueue_Info = xQueueCreate(20, sizeof(uint32_t));
 
+/***************************************************************************************/
 void WaitForUser(void)
 {
     SysInit_UpdateInfo("$ERR");
@@ -22,6 +26,7 @@ void WaitForUser(void)
     }
 }
 
+/***************************************************************************************/
 void SysInit_Start(void)
 {
     bool ret = false;
