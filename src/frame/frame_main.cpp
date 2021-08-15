@@ -1,3 +1,4 @@
+#include "WiFi.h"
 #include "frame_main.h"
 #include "frame_setting.h"
 #include "frame_keyboard.h"
@@ -7,6 +8,7 @@
 #include "frame_fileindex.h"
 #include "frame_compare.h"
 #include "frame_home.h"
+#include <HTTPClient.h>
 
 enum
 {
@@ -15,11 +17,13 @@ enum
 	kKeySetting,
 	kKeyKeyboard,
 	kKeyWifiScan,
+
 	// Second row
 	kKeySDFile,
 	kKeyCompare,
 	kKeyHome,
 	kKeyLifeGame,
+
 	// Third row
 	kKeyMQTT,
 	kKeyShutdown = 11
@@ -139,6 +143,37 @@ void key_mqtt_cb(epdgui_args_vector_t &args)
 	}
 	// EPDGUI_PushFrame(frame);
 	*((int *)(args[0])) = 0;
+
+
+	Serial.println("************************************");
+	Serial.println("Querying weather:");
+
+	HTTPClient http; // Declare an object of class HTTPClient
+	String Location = "Moorenweis, DE";
+	String API_Key = "de1d0d744c2fb068edb714ce62b12957";
+
+	// specify request destination
+	String RequestUrl = "";
+	RequestUrl += "http://api.openweathermap.org/data/2.5/onecall?";
+	RequestUrl += "lat=48.1546";
+	RequestUrl += "&lon=11.0821";
+	RequestUrl += "&exclude=minutely,hourly";
+	RequestUrl += "&appid=" + API_Key;
+	http.begin(RequestUrl);
+
+	int httpCode = http.GET(); // Sending the request
+
+	if (httpCode > 0) // Checking the returning code
+	{
+		String payload = http.getString(); // Getting the request response payload
+
+		Serial.println(payload);
+	}
+	else
+	{
+		Serial.println("  Error getting weather ...");
+	}
+	Serial.println("");
 }
 
 /***********************************************************************************************************************/
@@ -236,7 +271,7 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	_key[kKeyShutdown]->CanvasPressed()->ReverseColor();
 	_key[kKeyShutdown]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
 	_key[kKeyShutdown]->Bind(EPDGUI_Button::EVENT_RELEASED, key_shutdown_cb);
-	
+
 	_time = 0;
 	_next_update_time = 0;
 }
@@ -296,7 +331,15 @@ void Frame_Main::StatusBar(m5epd_update_mode_t mode)
 	_bar->fillCanvas(0);
 	_bar->drawFastHLine(0, 43, 540, 15);
 	_bar->setTextDatum(CL_DATUM);
-	_bar->drawString("M5Paper", 10, 27);
+	//_bar->drawString("Mike", 10, 27);
+	if (WiFi.isConnected())
+	{
+		_bar->drawString(WiFi.SSID().c_str(), 10, 27);
+	}
+	else
+	{
+		_bar->drawString("Offline", 10, 27);
+	}
 
 	// Battery
 	_bar->setTextDatum(CR_DATUM);

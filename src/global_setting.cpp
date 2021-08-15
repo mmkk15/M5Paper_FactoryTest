@@ -152,8 +152,12 @@ const char *GetWallpaperName(uint16_t wallpaper_id)
     }
 }
 
+/**************************************************************************************************************/
 esp_err_t LoadSetting(void)
 {
+    Serial.println("******************************************");
+    Serial.println("LoadSetting(): Loading settings ...");
+
     nvs_handle nvs_arg;
     NVS_CHECK(nvs_open("Setting", NVS_READONLY, &nvs_arg));
     NVS_CHECK(nvs_get_u16(nvs_arg, "Wallpaper", &global_wallpaper));
@@ -175,9 +179,15 @@ esp_err_t LoadSetting(void)
     global_wifi_password = String(buf);
     global_wifi_configed = true;
     nvs_close(nvs_arg);
+
+    Serial.println("Wifi settings:");
+    Serial.println("SSID: " + global_wifi_ssid);
+    Serial.println("PW:   " + global_wifi_password);
+
     return ESP_OK;
 }
 
+/**************************************************************************************************************/
 esp_err_t SaveSetting(void)
 {
     nvs_handle nvs_arg;
@@ -193,6 +203,7 @@ esp_err_t SaveSetting(void)
     return ESP_OK;
 }
 
+/**************************************************************************************************************/
 void SetWifi(String ssid, String password)
 {
     global_wifi_ssid = ssid;
@@ -200,21 +211,25 @@ void SetWifi(String ssid, String password)
     SaveSetting();
 }
 
+/**************************************************************************************************************/
 uint8_t isWiFiConfiged(void)
 {
     return global_wifi_configed;
 }
 
+/**************************************************************************************************************/
 String GetWifiSSID(void)
 {
     return global_wifi_ssid;
 }
 
+/**************************************************************************************************************/
 String GetWifiPassword(void)
 {
     return global_wifi_password;
 }
 
+/**************************************************************************************************************/
 bool SyncNTPTime(void)
 {
     const char *ntpServer = "time.cloudflare.com";

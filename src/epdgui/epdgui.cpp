@@ -2,6 +2,7 @@
 #include <map>
 #include <list>
 #include "epdgui.h"
+#include "ota/MyOTA.h"
 
 /***************************************************************************************/
 typedef struct
@@ -91,6 +92,7 @@ void EPDGUI_Run(Frame_Base* frame)
         frame_switch_count++;
     }
 
+    // -----------------------------------------------------------------------------------
     while (1)
     {
         if((frame->isRun() == 0) || (frame->run() == 0))
@@ -125,8 +127,7 @@ void EPDGUI_Run(Frame_Base* frame)
                     EPDGUI_Process(M5.TP.readFingerX(0), M5.TP.readFingerY(0));
                     last_active_time = 0;
                 }
-            }
-            
+            }           
             
             M5.TP.flush();
         }
@@ -143,6 +144,8 @@ void EPDGUI_Run(Frame_Base* frame)
             }
             last_active_time = 0;
         }
+
+        handleOTA("MikesPaper");                                                    // Handle OTA 
     }
 }
 
@@ -154,6 +157,7 @@ void EPDGUI_MainLoop(void)
         Frame_Base *frame = frame_stack.top();
         log_d("Run %s", frame->GetFrameName().c_str());
         EPDGUI_Clear();
+
         _is_auto_update = true;
         frame->init(frame_map[frame->GetFrameName()].args);
         EPDGUI_Run(frame);

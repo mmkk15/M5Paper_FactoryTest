@@ -15,10 +15,10 @@ QueueHandle_t xQueue_Info = xQueueCreate(20, sizeof(uint32_t));
 void WaitForUser(void)
 {
     SysInit_UpdateInfo("$ERR");
-    while(1)
+    while (1)
     {
         M5.update();
-        if(M5.BtnP.wasReleased())
+        if (M5.BtnP.wasReleased())
         {
             SysInit_UpdateInfo("$RESUME");
             return;
@@ -59,7 +59,7 @@ void SysInit_Start(void)
     bool is_factory_test;
     SPI.begin(14, 13, 12, 4);
     ret = SD.begin(4, SPI, 20000000);
-    if(ret == false)
+    if (ret == false)
     {
         is_factory_test = true;
         SetInitStatus(0, 0);
@@ -73,7 +73,7 @@ void SysInit_Start(void)
     }
 
     SysInit_UpdateInfo("Initializing Touch pad...");
-    if(M5.TP.begin(21, 22, 36) != ESP_OK)
+    if (M5.TP.begin(21, 22, 36) != ESP_OK)
     {
         SetInitStatus(1, 0);
         log_e("Touch pad initialization failed.");
@@ -83,9 +83,9 @@ void SysInit_Start(void)
 
     M5.BatteryADCBegin();
     LoadSetting();
-    
+
     M5EPD_Canvas _initcanvas(&M5.EPD);
-    if((!is_factory_test) && SD.exists("/font.ttf"))
+    if ((!is_factory_test) && SD.exists("/font.ttf"))
     {
         _initcanvas.loadFont("/font.ttf", SD);
         SetTTFLoaded(true);
@@ -98,7 +98,7 @@ void SysInit_Start(void)
         is_factory_test = true;
     }
 
-    if(is_factory_test)
+    if (is_factory_test)
     {
         SysInit_UpdateInfo("$OK");
     }
@@ -107,13 +107,20 @@ void SysInit_Start(void)
         SysInit_UpdateInfo("Initializing system...");
     }
 
+    Serial.println("****************************************");
+    Serial.print("Factory test: ");
+    if (is_factory_test)
+        Serial.println("true");
+    else
+        Serial.println("false");
+
     _initcanvas.createRender(26, 128);
 
     Frame_Main *frame_main = new Frame_Main();
     EPDGUI_PushFrame(frame_main);
     Frame_FactoryTest *frame_factorytest = new Frame_FactoryTest();
     EPDGUI_AddFrame("Frame_FactoryTest", frame_factorytest);
-    if(!is_factory_test)
+    if (!is_factory_test)
     {
         Frame_Setting *frame_setting = new Frame_Setting();
         EPDGUI_AddFrame("Frame_Setting", frame_setting);
@@ -133,42 +140,52 @@ void SysInit_Start(void)
         EPDGUI_AddFrame("Frame_Compare", frame_compare);
         Frame_Home *frame_home = new Frame_Home();
         EPDGUI_AddFrame("Frame_Home", frame_home);
-
-        if(isWiFiConfiged())
-        {
-            SysInit_UpdateInfo("Connect to " + GetWifiSSID() + "...");
-            WiFi.begin(GetWifiSSID().c_str(), GetWifiPassword().c_str());
-            uint32_t t = millis();
-            while (1)
-            {
-                if(millis() - t > 8000)
-                {
-                    break;
-                }
-
-                if(WiFi.status() == WL_CONNECTED)
-                {
-                    frame_wifiscan->SetConnected(GetWifiSSID(), WiFi.RSSI());
-                    break;
-                }
-            }
-        }
     }
-    
+
     log_d("done");
 
-    while(uxQueueMessagesWaiting(xQueue_Info));
-    
-    if(!is_factory_test)
+    while (uxQueueMessagesWaiting(xQueue_Info))
+        ;
+
+    if (!is_factory_test)
     {
         SysInit_UpdateInfo("$OK");
     }
-    
+
+    // Check if Wifi is configured
+    Serial.println("****************************************");
+    Serial.println("Connecting WiFi:");
+    if (isWiFiConfiged())
+    {
+        Serial.println("  Connecting to SSID: " + GetWifiSSID());
+        SysInit_UpdateInfo("Connect to " + GetWifiSSID() + "...");
+        WiFi.begin(GetWifiSSID().c_str(), GetWifiPassword().c_str());
+        uint32_t t = millis();
+        while (1)
+        {
+            if (millis() - t > 15000)
+            {
+                break;
+            }
+
+            if (WiFi.status() == WL_CONNECTED)
+            {
+                //frame_wifiscan->SetConnected(GetWifiSSID(), WiFi.RSSI());
+                break;
+            }
+        }
+    }
+    else
+    {
+        Serial.println("  Wifi is not configured ...");
+    }
+
     Serial.println("OK");
 
     delay(500);
 }
 
+/***************************************************************************************/
 void SysInit_Loading(void *pvParameters)
 {
     const uint16_t kPosy = 548;
@@ -207,7 +224,7 @@ void SysInit_Loading(void *pvParameters)
     uint32_t time = 0;
     while (1)
     {
-        if(millis() - time > 250)
+        if (millis() - time > 250)
         {
             time = millis();
             LoadingIMG.pushImage(0, 0, 96, 96, kLD[i]);
@@ -218,29 +235,29 @@ void SysInit_Loading(void *pvParameters)
                 i = 0;
             }
         }
-        
-        if(xQueueReceive(xQueue_Info, &p, 0))
+
+        if (xQueueReceive(xQueue_Info, &p, 0))
         {
             String str(p);
             free(p);
-            if(str.indexOf("$OK") >= 0)
+            if (str.indexOf("$OK") >= 0)
             {
                 LoadingIMG.pushImage(0, 0, 96, 96, ImageResource_loading_success_96x96);
                 LoadingIMG.pushCanvas(220, kPosy + 80, UPDATE_MODE_GL16);
                 break;
             }
-            else if(str.indexOf("$ERR") >= 0)
+            else if (str.indexOf("$ERR") >= 0)
             {
                 LoadingIMG.pushImage(0, 0, 96, 96, ImageResource_loading_error_96x96);
                 LoadingIMG.pushCanvas(220, kPosy + 80, UPDATE_MODE_GL16);
                 LoadingIMG.fillCanvas(0);
-                while(1)
+                while (1)
                 {
-                    if(xQueueReceive(xQueue_Info, &p, 0))
+                    if (xQueueReceive(xQueue_Info, &p, 0))
                     {
                         String str(p);
                         free(p);
-                        if(str.indexOf("$RESUME") >= 0)
+                        if (str.indexOf("$RESUME") >= 0)
                         {
                             LoadingIMG.pushCanvas(220, kPosy + 80, UPDATE_MODE_GC16);
                             break;
@@ -255,16 +272,17 @@ void SysInit_Loading(void *pvParameters)
                 Info.pushCanvas(0, kPosy, UPDATE_MODE_DU);
             }
         }
-    } 
+    }
     vTaskDelete(NULL);
 }
 
+/***************************************************************************************/
 void SysInit_UpdateInfo(String info)
 {
-    char *p = (char*)malloc(info.length() + 1);
+    char *p = (char *)malloc(info.length() + 1);
     memcpy(p, info.c_str(), info.length());
     p[info.length()] = '\0';
-    if(xQueueSend(xQueue_Info, &p, 0) == 0)
+    if (xQueueSend(xQueue_Info, &p, 0) == 0)
     {
         free(p);
     }
