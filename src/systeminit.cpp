@@ -56,6 +56,7 @@ void SysInit_Start(void)
     disableCore0WDT();
     xTaskCreatePinnedToCore(SysInit_Loading, "SysInit_Loading", 4096, NULL, 1, NULL, 0);
     // SysInit_UpdateInfo("Initializing SD card...");
+    
     bool is_factory_test;
     SPI.begin(14, 13, 12, 4);
     ret = SD.begin(4, SPI, 20000000);

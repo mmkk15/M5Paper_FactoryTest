@@ -8,7 +8,7 @@
 #include "frame_fileindex.h"
 #include "frame_compare.h"
 #include "frame_home.h"
-#include <HTTPClient.h>
+#include "frame_testing.h"
 
 enum
 {
@@ -26,6 +26,8 @@ enum
 
 	// Third row
 	kKeyMQTT,
+	kKeyTesting,
+	kKeyNC1,
 	kKeyShutdown = 11
 };
 
@@ -138,42 +140,25 @@ void key_mqtt_cb(epdgui_args_vector_t &args)
 	if (frame == NULL)
 	{
 		Serial.printf("Frame_MQTT not found .... creating ...\n");
-		// frame = new Frame_Home();
-		// EPDGUI_AddFrame("Frame_MQTT", frame);
+		// frame = new Frame_Testing();
+		// EPDGUI_AddFrame("Frame_Testing", frame);
 	}
-	// EPDGUI_PushFrame(frame);
+	//EPDGUI_PushFrame(frame);
 	*((int *)(args[0])) = 0;
+}
 
-
-	Serial.println("************************************");
-	Serial.println("Querying weather:");
-
-	HTTPClient http; // Declare an object of class HTTPClient
-	String Location = "Moorenweis, DE";
-	String API_Key = "de1d0d744c2fb068edb714ce62b12957";
-
-	// specify request destination
-	String RequestUrl = "";
-	RequestUrl += "http://api.openweathermap.org/data/2.5/onecall?";
-	RequestUrl += "lat=48.1546";
-	RequestUrl += "&lon=11.0821";
-	RequestUrl += "&exclude=minutely,hourly";
-	RequestUrl += "&appid=" + API_Key;
-	http.begin(RequestUrl);
-
-	int httpCode = http.GET(); // Sending the request
-
-	if (httpCode > 0) // Checking the returning code
+/***********************************************************************************************************************/
+void key_testing_cb(epdgui_args_vector_t &args)
+{
+	Frame_Base *frame = EPDGUI_GetFrame("Frame_Testing");
+	if (frame == NULL)
 	{
-		String payload = http.getString(); // Getting the request response payload
-
-		Serial.println(payload);
+		Serial.printf("Frame_Testing not found .... creating ...\n");
+		frame = new Frame_Testing();
+		EPDGUI_AddFrame("Frame_Testing", frame);
 	}
-	else
-	{
-		Serial.println("  Error getting weather ...");
-	}
-	Serial.println("");
+	EPDGUI_PushFrame(frame);
+	*((int *)(args[0])) = 0;
 }
 
 /***********************************************************************************************************************/
@@ -265,6 +250,13 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	_key[kKeyMQTT]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
 	_key[kKeyMQTT]->Bind(EPDGUI_Button::EVENT_RELEASED, key_mqtt_cb);
 
+	// Testing
+	_key[kKeyTesting]->CanvasNormal()->pushImage(0, 0, 92, 92, ImageResource_main_icon_restart_92x92);
+	*(_key[kKeyTesting]->CanvasPressed()) = *(_key[kKeyTesting]->CanvasNormal());
+	_key[kKeyTesting]->CanvasPressed()->ReverseColor();
+	_key[kKeyTesting]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
+	_key[kKeyTesting]->Bind(EPDGUI_Button::EVENT_RELEASED, key_testing_cb);
+
 	// Shutdown
 	_key[kKeyShutdown]->CanvasNormal()->pushImage(0, 0, 92, 92, ImageResource_main_icon_shutdown_92x92);
 	*(_key[kKeyShutdown]->CanvasPressed()) = *(_key[kKeyShutdown]->CanvasNormal());
@@ -312,7 +304,7 @@ void Frame_Main::AppName(m5epd_update_mode_t mode)
 	_names->fillCanvas(0);
 	// Third row
 	_names->drawString("MQTT", 20 + 46 + 0 * 136, 16);
-	_names->drawString("---", 20 + 46 + 1 * 136, 16);
+	_names->drawString("Testing", 20 + 46 + 1 * 136, 16);
 	_names->drawString("---", 20 + 46 + 2 * 136, 16);
 	_names->drawString("Shutdown", 20 + 46 + 3 * 136, 16);
 	_names->pushCanvas(0, 488, mode);
