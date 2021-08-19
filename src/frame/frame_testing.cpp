@@ -1,6 +1,7 @@
 /***************************************************************************************************************/
 #include "frame_testing.h"
 #include <HTTPClient.h>
+#include "syslog/syslog.h"
 
 /***************************************************************************************************************/
 static uint16_t textsize = 26;
@@ -9,17 +10,17 @@ static uint16_t textsize = 26;
 // CALLBACK
 void key_testing_textclear_cb(epdgui_args_vector_t &args)
 {
-    Serial.println("Testing: Clear textbox");
+    Syslog.Add("Testing: Clear textbox");
     ((EPDGUI_Textbox *)(args[0]))->SetText("");
 }
 
 /***************************************************************************************************************/
 void key_action_cb(epdgui_args_vector_t &args)
 {
-    Serial.println("Testing: Action");
+    Syslog.Add("Testing: Action");
 
-    Serial.println("************************************");
-    Serial.println("Querying weather:");
+    Syslog.Add("************************************");
+    Syslog.Add("Querying weather:");
 
     HTTPClient http; // Declare an object of class HTTPClient
     String Location = "Moorenweis, DE";
@@ -37,19 +38,20 @@ void key_action_cb(epdgui_args_vector_t &args)
     RequestUrl += "q=Moorenweis,DE";
     RequestUrl += "&appid=" + API_Key;
 
+    Syslog.Add("RequestUrl: " + RequestUrl);
     http.begin(RequestUrl);                                     
     int httpCode = http.GET(); // Sending the request
     if (httpCode > 0) // Checking the returning code
     {
         String payload = http.getString(); // Getting the request response payload
-        Serial.println(payload);
+        Syslog.Add(payload);
         ((EPDGUI_Textbox *)(args[0]))->SetText(payload);
     }
     else
     {
-        Serial.println("  Error getting weather ...");
+        Syslog.Add("  Error getting weather ...");
     }
-    Serial.println("");
+    Syslog.Add("");
 }
 
 /***************************************************************************************************************/

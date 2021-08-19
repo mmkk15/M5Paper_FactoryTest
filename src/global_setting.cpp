@@ -2,6 +2,7 @@
 #include "./resources/ImageResource.h"
 #include "esp32-hal-log.h"
 #include <WiFi.h>
+#include "syslog/syslog.h"
 
 #define DEFAULT_WALLPAPER 2
 SemaphoreHandle_t _xSemaphore_LoadingAnime = NULL;
@@ -155,8 +156,8 @@ const char *GetWallpaperName(uint16_t wallpaper_id)
 /**************************************************************************************************************/
 esp_err_t LoadSetting(void)
 {
-    Serial.println("******************************************");
-    Serial.println("LoadSetting(): Loading settings ...");
+    Syslog.Add("*************************************");
+    Syslog.Add("LoadSetting() ...");
 
     nvs_handle nvs_arg;
     NVS_CHECK(nvs_open("Setting", NVS_READONLY, &nvs_arg));
@@ -180,9 +181,9 @@ esp_err_t LoadSetting(void)
     global_wifi_configed = true;
     nvs_close(nvs_arg);
 
-    Serial.println("Wifi settings:");
-    Serial.println("SSID: " + global_wifi_ssid);
-    Serial.println("PW:   " + global_wifi_password);
+    Syslog.Add("Wifi settings:");
+    Syslog.Add("SSID: " + global_wifi_ssid);
+    Syslog.Add("PW:   " + global_wifi_password);
 
     return ESP_OK;
 }

@@ -9,6 +9,7 @@
 #include "frame_compare.h"
 #include "frame_home.h"
 #include "frame_testing.h"
+#include "syslog/frame_syslog.h"
 
 enum
 {
@@ -28,7 +29,13 @@ enum
 	kKeyMQTT,
 	kKeyTesting,
 	kKeyNC1,
-	kKeyShutdown = 11
+	kKeyShutdown = 11,
+
+	// Forth row
+	kKeyNC4,
+	kKeyNC5,
+	kKeyNC6,
+	kKeySyslog = 15,
 };
 
 #define KEY_W 92
@@ -162,6 +169,20 @@ void key_testing_cb(epdgui_args_vector_t &args)
 }
 
 /***********************************************************************************************************************/
+void key_syslog_cb(epdgui_args_vector_t &args)
+{
+	Frame_Base *frame = EPDGUI_GetFrame("Frame_Syslog");
+	if (frame == NULL)
+	{
+		Serial.printf("Frame_Syslog not found .... creating ...\n");
+		frame = new Frame_Syslog();
+		EPDGUI_AddFrame("Frame_Syslog", frame);
+	}
+	EPDGUI_PushFrame(frame);
+	*((int *)(args[0])) = 0;
+}
+
+/***********************************************************************************************************************/
 extern void key_shutdown_cb(epdgui_args_vector_t &args);
 
 /***********************************************************************************************************************/
@@ -192,6 +213,11 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	for (int i = 0; i < 4; i++)
 	{
 		_key[i + 8] = new EPDGUI_Button("测试", 20 + i * 136, 390, KEY_W, KEY_H);
+	}
+	// Forth button row
+	for (int i = 0; i < 4; i++)
+	{
+		_key[i + 12] = new EPDGUI_Button("测试", 20 + i * 136, 540, KEY_W, KEY_H);
 	}
 
 	// First row
@@ -264,6 +290,13 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	_key[kKeyShutdown]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
 	_key[kKeyShutdown]->Bind(EPDGUI_Button::EVENT_RELEASED, key_shutdown_cb);
 
+	// Syslog
+	_key[kKeySyslog]->CanvasNormal()->pushImage(0, 0, 92, 92, ImageResource_main_icon_setting_92x92);
+	*(_key[kKeySyslog]->CanvasPressed()) = *(_key[kKeySyslog]->CanvasNormal());
+	_key[kKeySyslog]->CanvasPressed()->ReverseColor();
+	_key[kKeySyslog]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
+	_key[kKeySyslog]->Bind(EPDGUI_Button::EVENT_RELEASED, key_syslog_cb);
+
 	_time = 0;
 	_next_update_time = 0;
 }
@@ -286,13 +319,12 @@ void Frame_Main::AppName(m5epd_update_mode_t mode)
 	}
 	_names->setTextSize(20);
 	_names->fillCanvas(0);
-	_names->drawString("WLAN", 20 + 46 + 3 * 136, 16);
-
 	// Render button names
 	// First row
 	_names->drawString("Test", 20 + 46, 16);
 	_names->drawString("Setting", 20 + 46 + 136, 16);
 	_names->drawString("Keyboard", 20 + 46 + 2 * 136, 16);
+	_names->drawString("WLAN", 20 + 46 + 3 * 136, 16);
 	_names->pushCanvas(0, 186, mode);
 	_names->fillCanvas(0);
 	// Second row
@@ -308,6 +340,12 @@ void Frame_Main::AppName(m5epd_update_mode_t mode)
 	_names->drawString("---", 20 + 46 + 2 * 136, 16);
 	_names->drawString("Shutdown", 20 + 46 + 3 * 136, 16);
 	_names->pushCanvas(0, 488, mode);
+	// Forth row
+	_names->drawString("---", 20 + 46 + 0 * 136, 16);
+	_names->drawString("---", 20 + 46 + 1 * 136, 16);
+	_names->drawString("---", 20 + 46 + 2 * 136, 16);
+	_names->drawString("Syslog", 20 + 46 + 3 * 136, 16);
+	_names->pushCanvas(0, 639, mode);
 }
 
 /***********************************************************************************************************************/
