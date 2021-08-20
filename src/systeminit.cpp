@@ -1,13 +1,13 @@
 /***************************************************************************************/
 /*** Includes ***/
 #include "systeminit.h"
+#include "Free_Fonts.h"
 #include "epdgui/epdgui.h"
 #include "frame/frame.h"
-#include "Free_Fonts.h"
 #include "global_setting.h"
 #include "resources/binaryttf.h"
-#include <WiFi.h>
 #include "syslog/syslog.h"
+#include <WiFi.h>
 
 /***************************************************************************************/
 QueueHandle_t xQueue_Info = xQueueCreate(20, sizeof(uint32_t));
@@ -40,7 +40,7 @@ void WiFiEventCallback(WiFiEvent_t event, system_event_info_t info)
 		Syslog.Add("Completed scan for access points");
 		break;
 	case SYSTEM_EVENT_STA_START:
-		Syslog.Add("WiFi client started");		
+		Syslog.Add("WiFi client started");
 		break;
 	case SYSTEM_EVENT_STA_STOP:
 		Syslog.Add("WiFi clients stopped");
@@ -303,8 +303,8 @@ void SysInit_Loading(void *pvParameters)
 	//M5.EPD.WritePartGram4bpp(92, 182, 356, 300, ImageResource_logo_356x300);
 	M5.EPD.UpdateFull(UPDATE_MODE_GC16);
 
-	int i = 0;
-	char *p;
+	int		 i = 0;
+	char *	 p;
 	uint32_t time = 0;
 	while (1)
 	{

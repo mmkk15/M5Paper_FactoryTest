@@ -29,9 +29,6 @@ private: // --------------------------------------------------------------------
     bool m_hasChanged;
 };
 
-
-
-
-extern  C_SYSLOG Syslog;
+extern C_SYSLOG Syslog;
 
 #endif

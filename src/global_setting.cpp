@@ -1,14 +1,16 @@
+/*************************************************************************************************************/
+/*** Includes ***/
 #include "global_setting.h"
 #include "./resources/ImageResource.h"
 #include "esp32-hal-log.h"
-#include <WiFi.h>
 #include "syslog/syslog.h"
+#include <WiFi.h>
 
 #define DEFAULT_WALLPAPER 2
 SemaphoreHandle_t _xSemaphore_LoadingAnime = NULL;
 static uint8_t _loading_anime_eixt_flag = false;
 esp_err_t __espret__;
-#define NVS_CHECK(x)              \
+#define NVS_CHECK(x)          \
     __espret__ = x;           \
     if (__espret__ != ESP_OK) \
     {                         \
@@ -20,8 +22,7 @@ esp_err_t __espret__;
 const uint8_t *wallpapers[] = {
     ImageResource_wallpaper_m5stack_540x960,
     ImageResource_wallpaper_engine_540x960,
-    ImageResource_wallpaper_penrose_triangle_540x960
-};
+    ImageResource_wallpaper_penrose_triangle_540x960};
 
 const uint8_t *kIMGLoading[16] = {
     ImageResource_item_loading_01_32x32,
@@ -39,23 +40,19 @@ const uint8_t *kIMGLoading[16] = {
     ImageResource_item_loading_13_32x32,
     ImageResource_item_loading_14_32x32,
     ImageResource_item_loading_15_32x32,
-    ImageResource_item_loading_16_32x32
-};
+    ImageResource_item_loading_16_32x32};
 const char *wallpapers_name_en[] = {
     "M5Paper",
     "Engine",
-    "Penrose Triangle"
-};
+    "Penrose Triangle"};
 const char *wallpapers_name_zh[] = {
     "M5Paper",
     "引擎",
-    "彭罗斯三角"
-};
+    "彭罗斯三角"};
 const char *wallpapers_name_ja[] = {
     "M5Paper",
     "エンジン",
-    "ペンローズの三角形"
-};
+    "ペンローズの三角形"};
 uint16_t global_wallpaper = DEFAULT_WALLPAPER;
 uint8_t global_language = LANGUAGE_EN;
 String global_wifi_ssid;
@@ -66,50 +63,59 @@ uint8_t global_time_synced = false;
 uint8_t global_ttf_file_loaded = false;
 uint8_t global_init_status = 0xFF;
 int8_t global_timezone = 8;
+uint32_t global_mqtt_server_ip = 0;
 
-
+/*************************************************************************************************************/
 int8_t GetTimeZone(void)
 {
     return global_timezone;
 }
 
+/*************************************************************************************************************/
 void SetTimeZone(int8_t time_zone)
 {
     global_timezone = time_zone;
 }
 
+/*************************************************************************************************************/
 void SetInitStatus(uint8_t idx, uint8_t val)
 {
     global_init_status &= ~(1 << idx);
     global_init_status |= (val << idx);
 }
 
+/*************************************************************************************************************/
 uint8_t GetInitStatus(uint8_t idx)
 {
     return (global_init_status & (1 << idx)) ? true : false;
 }
 
+/*************************************************************************************************************/
 void SetTTFLoaded(uint8_t val)
 {
     global_ttf_file_loaded = val;
 }
 
+/*************************************************************************************************************/
 uint8_t isTTFLoaded()
 {
     return global_ttf_file_loaded;
 }
 
+/*************************************************************************************************************/
 uint8_t isTimeSynced(void)
 {
     return global_time_synced;
 }
 
+/*************************************************************************************************************/
 void SetTimeSynced(uint8_t val)
 {
     global_time_synced = val;
     SaveSetting();
 }
 
+/*************************************************************************************************************/
 void SetLanguage(uint8_t language)
 {
     if (language >= LANGUAGE_EN && language <= LANGUAGE_ZH)
@@ -119,27 +125,32 @@ void SetLanguage(uint8_t language)
     SaveSetting();
 }
 
+/*************************************************************************************************************/
 uint8_t GetLanguage(void)
 {
     return global_language;
 }
 
+/*************************************************************************************************************/
 void SetWallpaper(uint16_t wallpaper_id)
 {
     global_wallpaper = wallpaper_id;
     SaveSetting();
 }
 
+/*************************************************************************************************************/
 uint16_t GetWallpaperID(void)
 {
     return global_wallpaper;
 }
 
+/*************************************************************************************************************/
 const uint8_t *GetWallpaper(void)
 {
     return wallpapers[global_wallpaper];
 }
 
+/*************************************************************************************************************/
 const char *GetWallpaperName(uint16_t wallpaper_id)
 {
     switch (global_language)
@@ -166,11 +177,11 @@ esp_err_t LoadSetting(void)
     NVS_CHECK(nvs_get_u8(nvs_arg, "Timesync", &global_time_synced));
     nvs_get_i8(nvs_arg, "timezone", &global_timezone);
 
-    if(global_wallpaper >= WALLPAPER_NUM)
+    if (global_wallpaper >= WALLPAPER_NUM)
     {
         global_wallpaper = DEFAULT_WALLPAPER;
     }
-    
+
     size_t length = 128;
     char buf[128];
     NVS_CHECK(nvs_get_str(nvs_arg, "ssid", buf, &length));
@@ -199,6 +210,7 @@ esp_err_t SaveSetting(void)
     NVS_CHECK(nvs_set_i8(nvs_arg, "timezone", global_timezone));
     NVS_CHECK(nvs_set_str(nvs_arg, "ssid", global_wifi_ssid.c_str()));
     NVS_CHECK(nvs_set_str(nvs_arg, "pswd", global_wifi_password.c_str()));
+    NVS_CHECK(nvs_set_u32(nvs_arg, "mqtt_ip", global_mqtt_server_ip));
     NVS_CHECK(nvs_commit(nvs_arg));
     nvs_close(nvs_arg);
     return ESP_OK;
@@ -257,6 +269,7 @@ bool SyncNTPTime(void)
     return 0;
 }
 
+/*************************************************************************************************************/
 uint16_t GetTextSize()
 {
     return global_reader_textsize;
@@ -267,7 +280,7 @@ void SetTextSize(uint16_t size)
     global_reader_textsize = size;
 }
 
-const uint8_t* GetLoadingIMG_32x32(uint8_t id)
+const uint8_t *GetLoadingIMG_32x32(uint8_t id)
 {
     return kIMGLoading[id];
 }
@@ -286,20 +299,20 @@ void __LoadingAnime_32x32(void *pargs)
     uint32_t time = 0;
     while (1)
     {
-        if(millis() - time > 200)
+        if (millis() - time > 200)
         {
             time = millis();
             loading.pushImage(0, 0, 32, 32, GetLoadingIMG_32x32(anime_cnt));
             loading.pushCanvas(x, y, UPDATE_MODE_DU4);
             anime_cnt++;
-            if(anime_cnt == 16)
+            if (anime_cnt == 16)
             {
                 anime_cnt = 0;
             }
         }
 
         xSemaphoreTake(_xSemaphore_LoadingAnime, portMAX_DELAY);
-        if(_loading_anime_eixt_flag == true)
+        if (_loading_anime_eixt_flag == true)
         {
             xSemaphoreGive(_xSemaphore_LoadingAnime);
             break;
@@ -311,12 +324,12 @@ void __LoadingAnime_32x32(void *pargs)
 
 void LoadingAnime_32x32_Start(uint16_t x, uint16_t y)
 {
-    if(_xSemaphore_LoadingAnime == NULL)
+    if (_xSemaphore_LoadingAnime == NULL)
     {
         _xSemaphore_LoadingAnime = xSemaphoreCreateMutex();
     }
     _loading_anime_eixt_flag = false;
-    uint16_t *pos = (uint16_t*)calloc(2, sizeof(uint16_t));
+    uint16_t *pos = (uint16_t *)calloc(2, sizeof(uint16_t));
     pos[0] = x;
     pos[1] = y;
     xTaskCreatePinnedToCore(__LoadingAnime_32x32, "__LoadingAnime_32x32", 16 * 1024, pos, 1, NULL, 0);
