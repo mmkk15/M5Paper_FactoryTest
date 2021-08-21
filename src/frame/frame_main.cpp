@@ -1,14 +1,15 @@
-#include "WiFi.h"
 #include "frame_main.h"
-#include "frame_setting.h"
-#include "frame_keyboard.h"
-#include "frame_factorytest.h"
-#include "frame_wifiscan.h"
-#include "frame_lifegame.h"
-#include "frame_fileindex.h"
+#include "WiFi.h"
 #include "frame_compare.h"
+#include "frame_factorytest.h"
+#include "frame_fileindex.h"
 #include "frame_home.h"
+#include "frame_keyboard.h"
+#include "frame_lifegame.h"
+#include "frame_setting.h"
 #include "frame_testing.h"
+#include "frame_wifiscan.h"
+#include "openweather/frame_weather.h"
 #include "syslog/frame_syslog.h"
 
 enum
@@ -32,7 +33,7 @@ enum
 	kKeyShutdown = 11,
 
 	// Forth row
-	kKeyNC4,
+	kKeyWeather,
 	kKeyNC5,
 	kKeyNC6,
 	kKeySyslog = 15,
@@ -183,13 +184,28 @@ void key_syslog_cb(epdgui_args_vector_t &args)
 }
 
 /***********************************************************************************************************************/
+static void key_weather_cb(epdgui_args_vector_t &args)
+{
+	Frame_Base *frame = EPDGUI_GetFrame("Frame_Weather");
+	if (frame == NULL)
+	{
+		Serial.printf("Frame_Weather not found .... creating ...\n");
+		frame = new Frame_Weather();
+		EPDGUI_AddFrame("Frame_Weather", frame);
+	}
+	EPDGUI_PushFrame(frame);
+	*((int *)(args[0])) = 0;
+}
+
+/***********************************************************************************************************************/
 extern void key_shutdown_cb(epdgui_args_vector_t &args);
 
 /***********************************************************************************************************************/
-Frame_Main::Frame_Main(void) : Frame_Base(false)
+Frame_Main::Frame_Main(void)
+	: Frame_Base(false)
 {
 	_frame_name = "Frame_Main";
-	_frame_id = 1;
+	_frame_id	= 1;
 
 	_bar = new M5EPD_Canvas(&M5.EPD);
 	_bar->createCanvas(540, 44);
@@ -290,6 +306,13 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	_key[kKeyShutdown]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
 	_key[kKeyShutdown]->Bind(EPDGUI_Button::EVENT_RELEASED, key_shutdown_cb);
 
+	// Weather
+	_key[kKeyWeather]->CanvasNormal()->pushImage(0, 0, 92, 92, ImageResource_main_icon_home_92x92);
+	*(_key[kKeyWeather]->CanvasPressed()) = *(_key[kKeyWeather]->CanvasNormal());
+	_key[kKeyWeather]->CanvasPressed()->ReverseColor();
+	_key[kKeyWeather]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
+	_key[kKeyWeather]->Bind(EPDGUI_Button::EVENT_RELEASED, key_weather_cb);
+
 	// Syslog
 	_key[kKeySyslog]->CanvasNormal()->pushImage(0, 0, 92, 92, ImageResource_main_icon_setting_92x92);
 	*(_key[kKeySyslog]->CanvasPressed()) = *(_key[kKeySyslog]->CanvasNormal());
@@ -297,7 +320,7 @@ Frame_Main::Frame_Main(void) : Frame_Base(false)
 	_key[kKeySyslog]->AddArgs(EPDGUI_Button::EVENT_RELEASED, 0, (void *)(&_is_run));
 	_key[kKeySyslog]->Bind(EPDGUI_Button::EVENT_RELEASED, key_syslog_cb);
 
-	_time = 0;
+	_time			  = 0;
 	_next_update_time = 0;
 }
 
@@ -341,7 +364,7 @@ void Frame_Main::AppName(m5epd_update_mode_t mode)
 	_names->drawString("Shutdown", 20 + 46 + 3 * 136, 16);
 	_names->pushCanvas(0, 488, mode);
 	// Forth row
-	_names->drawString("---", 20 + 46 + 0 * 136, 16);
+	_names->drawString("Weather", 20 + 46 + 0 * 136, 16);
 	_names->drawString("---", 20 + 46 + 1 * 136, 16);
 	_names->drawString("---", 20 + 46 + 2 * 136, 16);
 	_names->drawString("Syslog", 20 + 46 + 3 * 136, 16);
@@ -409,7 +432,7 @@ void Frame_Main::StatusBar(m5epd_update_mode_t mode)
 	_bar->drawString(buf, 270, 27);
 	_bar->pushCanvas(0, 0, mode);
 
-	_time = millis();
+	_time			  = millis();
 	_next_update_time = (60 - time_struct.sec) * 1000;
 }
 
@@ -422,7 +445,7 @@ int Frame_Main::init(epdgui_args_vector_t &args)
 	{
 		EPDGUI_AddObject(_key[i]);
 	}
-	_time = 0;
+	_time			  = 0;
 	_next_update_time = 0;
 	StatusBar(UPDATE_MODE_NONE);
 	AppName(UPDATE_MODE_NONE);
