@@ -1,0 +1,43 @@
+{
+    "coord": {
+        "lon": 11.0785,
+        "lat": 48.1556
+    },
+    "weather": [
+        {
+            "id": 800,
+            "main": "Clear",
+            "description": "clear sky",
+            "icon": "01d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 291.82,
+        "feels_like": 291.81,
+        "temp_min": 288.94,
+        "temp_max": 294.32,
+        "pressure": 1020,
+        "humidity": 79
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 1.03,
+        "deg": 0
+    },
+    "clouds": {
+        "all": 0
+    },
+    "dt": 1629532006,
+    "sys": {
+        "type": 1,
+        "id": 1865,
+        "country": "DE",
+        "sunrise": 1629519513,
+        "sunset": 1629569968
+    },
+    "timezone": 7200,
+    "id": 2869682,
+    "name": "Moorenweis",
+    "cod": 200
+}

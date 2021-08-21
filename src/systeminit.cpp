@@ -137,7 +137,7 @@ void SysInit_Start(void)
 	// M5.disableEPDPower();
 	// delay(500);
 	M5.enableEPDPower();
-	delay(200); // 1000
+	delay(500); // 1000
 
 	M5.EPD.begin(M5EPD_SCK_PIN, M5EPD_MOSI_PIN, M5EPD_MISO_PIN, M5EPD_CS_PIN, M5EPD_BUSY_PIN);
 	M5.EPD.Clear(true);

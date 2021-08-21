@@ -2,19 +2,34 @@
 #define __DRV_OPENWEATHER_H__
 
 /************************************************************************************/
-// https://openweathermap.org/weather-conditions
+// Documentation: https://openweathermap.org/weather-conditions
 
 /************************************************************************************/
-class DRV_Openweather
+/*** Includes ***/
+#include "drv_openweather_types.h"
+
+/************************************************************************************/
+class C_OpenWeatherMap
 {
 public:
-	DRV_Openweather();
-	~DRV_Openweather();
+	C_OpenWeatherMap();
+	C_OpenWeatherMap(String ApiKey);
+	~C_OpenWeatherMap();
+
+	void			 setAPIKey(String ApiKey);
+	bool			 queryWeather(String Location);
+	const S_Weather *getWeather();
+	String			 getWeatherString();
 
 private:
+	String	  m_ApiKey;
+	S_Weather m_sWeather;
+	String	  m_WeatherString;
+
+	String ConvertUnixTime(uint32_t unix_time);
 };
 
 /************************************************************************************/
-extern DRV_Openweather Openweather;
+extern C_OpenWeatherMap Openweather;
 
 #endif

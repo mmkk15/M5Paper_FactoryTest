@@ -1,8 +1,7 @@
 /***************************************************************************************************************/
 #include "frame_testing.h"
+#include "drv_openweather/drv_openweather.h"
 #include "syslog/syslog.h"
-#include <ArduinoJson.h>
-#include <HTTPClient.h>
 
 /***************************************************************************************************************/
 static uint16_t textsize = 26;
@@ -25,73 +24,11 @@ void key_testing_textclear_cb(epdgui_args_vector_t &args)
 /***************************************************************************************************************/
 void key_action_cb(epdgui_args_vector_t &args)
 {
-	Syslog.Add("Testing: Action");
+	Openweather.queryWeather("Moorenweis, DE");
 
-	Syslog.Add("************************************");
-	Syslog.Add("Querying weather:");
+	String weatherString = Openweather.getWeatherString();
 
-	HTTPClient http; // Declare an object of class HTTPClient
-	String	   Location = "Moorenweis, DE";
-	String	   API_Key	= "de1d0d744c2fb068edb714ce62b12957";
-
-	String RequestUrl;
-	// ONE CALL - very long answer
-	RequestUrl = "http://api.openweathermap.org/data/2.5/onecall?";
-	RequestUrl += "lat=48.1546";
-	RequestUrl += "&lon=11.0821";
-	RequestUrl += "&exclude=minutely,hourly";
-
-	// Current weather
-	RequestUrl = "http://api.openweathermap.org/data/2.5/weather?";
-	RequestUrl += "q=Moorenweis,DE";
-	RequestUrl += "&appid=" + API_Key;
-
-	Syslog.Add("RequestUrl: " + RequestUrl);
-	http.begin(RequestUrl);
-	int httpCode = http.GET();			   // Sending the request
-	if (httpCode > 0)					   // Checking the returning code
-	{									   //
-		String payload = http.getString(); // Getting the request response payload
-        Syslog.Add("Received http response. Length: " + String(payload.length()));
-		Syslog.Add(payload);
-		((EPDGUI_Textbox *)(args[0]))->SetText(payload);
-
-		//DynamicJsonDocument doc(512);
-        StaticJsonDocument<1024> doc;
-
-		// Parse JSON object
-		// Deserialize the JSON document
-		DeserializationError error = deserializeJson(doc, payload);
-
-		if (error)
-			Syslog.Add("JSON Deserialization failed ...");
-		else
-		{
-			temp		= (int)(doc["main"]["temp"]) - 273.15;	   // Get temperature in °C
-			humidity	= doc["main"]["humidity"];				   // Get humidity in %
-			visibility	= (uint_fast8_t)doc["visibility"];		   // Get visibility in m
-			pressure	= (uint_fast8_t)(doc["main"]["pressure"]); // Get pressure in bar
-			wind_speed	= (float)(doc["wind"]["speed"]);		   // Get wind speed in m/s
-			wind_degree = (float)(doc["wind"]["deg"]);			   // Get wind degree in °
-
-			// upweatherId	  = (const char *)(root["weather"][0]["id"]);
-			// upweatherMain = (const char *)(root["weather"][0]["main"]);
-			// upweatherDesc = (const char *)(root["weather"][0]["description"]);
-			// upweatherIcon = (const char *)(root["weather"][0]["icon"]);
-
-			// upsunrise = (root["sys"]["sunrise"]);
-			// upsunset  = (root["sys"]["sunset"]);
-			Syslog.Add("Temperature: " + String(temp) + "°C");
-			Syslog.Add("Humidity:    " + String(humidity) + "%");
-			Syslog.Add("Wind speed:  " + String(wind_speed) + "m/s");
-			Syslog.Add("Wind speed:  " + String(wind_degree) + "°");
-		}
-	}
-	else
-	{
-		Syslog.Add("  Error getting weather ...");
-	}
-	http.end(); // Close connection
+	((EPDGUI_Textbox *)(args[0]))->SetText(weatherString);
 }
 
 /***************************************************************************************************************/
@@ -100,7 +37,7 @@ Frame_Testing::Frame_Testing()
 {
 	_frame_name = "Frame_Testing";
 
-	inputbox = new EPDGUI_Textbox(4, 100, 532, 512);
+	inputbox = new EPDGUI_Textbox(4, 100, 532, 750);
 	inputbox->SetTextSize(textsize);
 	inputbox->SetState(EPDGUI_Textbox::EVENT_PRESSED);
 

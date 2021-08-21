@@ -6,10 +6,11 @@ ColumnLimit: 0
 AccessModifierOffset: -4
 NamespaceIndentation: All
 AlignAfterOpenBracket: true
-AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveAssignments: AcrossComments
 AlignConsecutiveDeclarations: Consecutive
 AlignConsecutiveMacros: Consecutive
 AlignOperands: true
+EmptyLineBeforeAccessModifier: Always
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeCaseColon: false
 BreakBeforeBraces: Custom 
