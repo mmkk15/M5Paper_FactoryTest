@@ -13,7 +13,6 @@ void MQTT_connect()
 {
 	// Add your MQTT Broker IP address, example:
 	//const char* mqtt_server = "192.168.1.144";
-	uint8_t		test;
 	const char *mqtt_server = "10.0.10.1";
 
 	if (WiFi.isConnected())

@@ -75,30 +75,33 @@ bool C_OpenWeatherMap::queryWeather(String Location)
 			// Weather
 			m_sWeather.Weather.WeatherConditionID	  = doc["weather"][0]["id"];
 			m_sWeather.Weather.WeatherMainDescription = String((const char *)(doc["weather"][0]["main"]));
-			m_sWeather.Weather.WeatherDescription	  = String((const char *)(doc["weather"][0]["description"]));
-			m_sWeather.Weather.WeatherIcon			  = String((const char *)(doc["weather"][0]["icon"]));
+			m_sWeather.Weather.WeatherDescription	 = String((const char *)(doc["weather"][0]["description"]));
+			m_sWeather.Weather.WeatherIcon			 = String((const char *)(doc["weather"][0]["icon"]));
 			// Main
-			m_sWeather.Main.Temperature__dC			  = (float)(doc["main"]["temp"]) - 273.15f;
-			m_sWeather.Main.TemperatureFeelsLike__dC  = (float)(doc["main"]["feels_like"]) - 273.15f;
-			m_sWeather.Main.TemperatureMin__dC		  = (float)(doc["main"]["temp_min"]) - 273.15f;
-			m_sWeather.Main.TemperatureMax__dC		  = (float)(doc["main"]["temp_max"]) - 273.15f;
-			m_sWeather.Main.Pressure__hPa			  = doc["main"]["pressure"];
-			m_sWeather.Main.Humidity__pct			  = doc["main"]["humidity"];
+			m_sWeather.Main.Temperature__dC			 = (float)(doc["main"]["temp"]) - 273.15f;
+			m_sWeather.Main.TemperatureFeelsLike__dC = (float)(doc["main"]["feels_like"]) - 273.15f;
+			m_sWeather.Main.TemperatureMin__dC		 = (float)(doc["main"]["temp_min"]) - 273.15f;
+			m_sWeather.Main.TemperatureMax__dC		 = (float)(doc["main"]["temp_max"]) - 273.15f;
+			m_sWeather.Main.Pressure__hPa			 = doc["main"]["pressure"];
+			m_sWeather.Main.Humidity__pct			 = doc["main"]["humidity"];
 			// Wind
-			m_sWeather.Wind.Speed__m_d_s			  = doc["wind"]["speed"];
-			m_sWeather.Wind.Direction__deg			  = doc["wind"]["deg"];
+			m_sWeather.Wind.Speed__m_d_s			 = doc["wind"]["speed"];
+			m_sWeather.Wind.Direction__deg			 = doc["wind"]["deg"];
 			// Sys
-			m_sWeather.Visibility__m				  = doc["visibility"];
+			m_sWeather.Visibility__m				 = doc["visibility"];
 			// Clouds
-			m_sWeather.Cloudiness__pct				  = doc["clouds"]["all"];
+			m_sWeather.Cloudiness__pct				 = doc["clouds"]["all"];
 			// Timezone
-			m_sWeather.ShiftSecondsToUTC			  = doc["timezone"];
+			m_sWeather.ShiftSecondsToUTC			 = doc["timezone"];
 			// Sys
-			m_sWeather.Sys.SunriseTime__unixUTC		  = doc["sys"]["sunrise"];
-			m_sWeather.Sys.SunsetTime__unixUTC		  = doc["sys"]["sunset"];
-			m_sWeather.Sys.Country					  = String((const char *)(doc["sys"]["country"]));
-			m_sWeather.Sys.SunriseTime__unixUTC		  = m_sWeather.Sys.SunriseTime__unixUTC + m_sWeather.ShiftSecondsToUTC;
-			m_sWeather.Sys.SunsetTime__unixUTC		  = m_sWeather.Sys.SunsetTime__unixUTC + m_sWeather.ShiftSecondsToUTC;
+			m_sWeather.Sys.SunriseTime__unixUTC		 = doc["sys"]["sunrise"];
+			m_sWeather.Sys.SunsetTime__unixUTC		 = doc["sys"]["sunset"];
+			m_sWeather.Sys.Country					 = String((const char *)(doc["sys"]["country"]));
+			m_sWeather.Sys.SunriseTime__unixUTC		 = m_sWeather.Sys.SunriseTime__unixUTC + m_sWeather.ShiftSecondsToUTC;
+			m_sWeather.Sys.SunsetTime__unixUTC		 = m_sWeather.Sys.SunsetTime__unixUTC + m_sWeather.ShiftSecondsToUTC;
+
+			m_sWeather.Weather.WeatherMainDescription.toUpperCase();
+			m_sWeather.Weather.WeatherDescription.toUpperCase();
 
 			m_WeatherString = "";
 			m_WeatherString += "Decoded weather: --------------\n";

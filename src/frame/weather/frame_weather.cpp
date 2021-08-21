@@ -1,6 +1,7 @@
 /***************************************************************************************************************/
 #include "frame_weather.h"
 #include "../../resources/myImages.h"
+#include "Free_Fonts.h"
 #include "drv_openweather/drv_openweather.h"
 #include "syslog/syslog.h"
 
@@ -74,23 +75,31 @@ int Frame_Weather::run(void)
 
 	if (update)
 	{
+		canvas.setFreeFont(FF20); // FF18
+		canvas.setTextDatum(TL_DATUM);
+		canvas.setTextColor(15);
 		canvas.setTextSize(26);
 
 		// Current weather
-		canvas.drawFastHLine(0, 135, 540, 15);
-		for (int i = 0; i < 540; i += 135)
-		{
-			canvas.drawFastVLine(i, 0, 135, 15);
-		}
-		canvas.drawString("T: " + String(w->Main.Temperature__dC + 0.5, 0) + "C", 10, 10);
+		canvas.setTextDatum(TC_DATUM);
+		canvas.drawString(w->Weather.WeatherDescription, 270, 12);
+		canvas.drawFastHLine(0, 62, 540, 15);
+
+		canvas.drawString("Temp", 90, 72);
+		canvas.drawString("Humidity", 270, 72);
+		canvas.drawString("Clouds", 450, 72);
+		canvas.drawString(String(w->Main.Temperature__dC + 0.5, 0) + " C", 90, 128);
+		canvas.drawString(String(w->Main.Humidity__pct) + "%", 270, 128);
+		canvas.drawString(String(w->Cloudiness__pct) + "%", 450, 128);
+		canvas.drawFastHLine(0, 182, 540, 15);
 
 		canvas.drawCircle(f1.x, f1.y - 72, 10, 15);
 
-		canvas.pushImage(240, 100, 92, 92, ImageResource_main_icon_keyboard_92x92);
+		//canvas.pushImage(240, 100, 92, 92, ImageResource_main_icon_keyboard_92x92);
 
 		update = 0;
 
-		canvas.pushCanvas(0, 72, UPDATE_MODE_DU4);
+		canvas.pushCanvas(0, 72, UPDATE_MODE_GC16);
 	}
 
 	return 1;

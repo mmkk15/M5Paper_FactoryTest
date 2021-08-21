@@ -5,6 +5,7 @@
 #include "epdgui/epdgui.h"
 #include "frame/frame.h"
 #include "global_setting.h"
+#include "resources/KeepCalmMedium.h"
 #include "resources/binaryttf.h"
 #include "syslog/syslog.h"
 #include <WiFi.h>
@@ -35,18 +36,21 @@ void WiFiEventCallback(WiFiEvent_t event, system_event_info_t info)
 	{
 	case SYSTEM_EVENT_WIFI_READY:
 		Syslog.Add("WiFi interface ready");
+		SysInit_UpdateInfo("Wifi ready. Connecting ...");
 		break;
 	case SYSTEM_EVENT_SCAN_DONE:
 		Syslog.Add("Completed scan for access points");
 		break;
 	case SYSTEM_EVENT_STA_START:
 		Syslog.Add("WiFi client started");
+		SysInit_UpdateInfo("Wifi client started ...");
 		break;
 	case SYSTEM_EVENT_STA_STOP:
 		Syslog.Add("WiFi clients stopped");
 		break;
 	case SYSTEM_EVENT_STA_CONNECTED:
 		Syslog.Add("Connected to access point");
+		SysInit_UpdateInfo("Wifi connected ...");
 		break;
 	case SYSTEM_EVENT_STA_DISCONNECTED:
 		Syslog.Add("Disconnected from WiFi access point");
@@ -55,6 +59,7 @@ void WiFiEventCallback(WiFiEvent_t event, system_event_info_t info)
 		Syslog.Add("Authentication mode of access point has changed");
 		break;
 	case SYSTEM_EVENT_STA_GOT_IP:
+		SysInit_UpdateInfo("Got IP " + WiFi.localIP().toString());
 		Syslog.Add("Obtained IP address: " + WiFi.localIP().toString());
 		break;
 	case SYSTEM_EVENT_STA_LOST_IP:
@@ -173,11 +178,15 @@ void SysInit_Start(void)
 		WaitForUser();
 	}
 
+	SysInit_UpdateInfo("Initializing ADC...");
 	M5.BatteryADCBegin();
+	SysInit_UpdateInfo("Initializing setting...");
 	LoadSetting();
 
+	SysInit_UpdateInfo("Initializing fonts...");
 	M5EPD_Canvas _initcanvas(&M5.EPD);
-	_initcanvas.loadFont(binaryttf, sizeof(binaryttf));
+	//_initcanvas.loadFont(binaryttf, sizeof(binaryttf));
+	_initcanvas.loadFont(KeepCalmMedium, sizeof(KeepCalmMedium));
 	SetTTFLoaded(false);
 	SetLanguage(LANGUAGE_EN);
 	is_factory_test = true;
@@ -264,6 +273,8 @@ void SysInit_Start(void)
 		Syslog.Add("  Wifi is not configured ...");
 	}
 
+	SysInit_UpdateInfo("System init complete.");
+
 	Syslog.Add("System init complete.");
 
 	delay(500);
@@ -295,7 +306,7 @@ void SysInit_Loading(void *pvParameters)
 	M5EPD_Canvas Info(&M5.EPD);
 	LoadingIMG.createCanvas(96, 96);
 	Info.createCanvas(540, 50);
-	Info.setFreeFont(FF18);
+	Info.setFreeFont(FF18); // FF18
 	Info.setTextSize(1);
 	Info.setTextDatum(CC_DATUM);
 	Info.setTextColor(15);

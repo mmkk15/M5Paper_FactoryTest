@@ -9,7 +9,7 @@
 #include "frame_setting.h"
 #include "frame_testing.h"
 #include "frame_wifiscan.h"
-#include "openweather/frame_weather.h"
+#include "weather/frame_weather.h"
 #include "syslog/frame_syslog.h"
 
 enum
