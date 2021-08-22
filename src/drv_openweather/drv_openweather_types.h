@@ -51,7 +51,33 @@ typedef struct
 /*********************************************/
 typedef struct
 {
+	uint32_t	   SunriseTime__unixUTC;
+	uint32_t	   SunsetTime__unixUTC;
+	float		   MoonPhase;
+	float		   TemperatureMorning__dC;
+	float		   TemperatureDay__dC;
+	float		   TemperatureEvening__dC;
+	float		   TemperatureNight__dC;
+	float		   TemperatureMin__dC;
+	float		   TemperatureMax__dC;
+	uint16_t	   Pressure__hPa;
+	uint16_t	   Humidity__pct;
+	float		   DewPoint__K;
+	float		   Wind_speed__m_d_s;
+	uint16_t	   Wind_deg;
+	float		   Wind_gust__m_d_s;
+	S_FieldWeather FieldWeather;
+	uint8_t		   Cloudiness__pct;
+	float		   PropabilityOfPrecipitation;
+	float		   RainAmount;
+	float		   UV_Index;
+} S_DayWeather;
+
+/*********************************************/
+typedef struct
+{
 	S_FieldLocation Location;
+	S_DayWeather	DayWeather[8]; // Index 0 = today, 1 = tomorrow, 2 = the day after tomorrow, ...
 	S_FieldWeather	Weather;
 	S_FieldMain		Main;
 	S_FieldWind		Wind;

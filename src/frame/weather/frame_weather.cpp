@@ -32,7 +32,8 @@ int Frame_Weather::init(epdgui_args_vector_t &args)
 {
 	Serial.println("Frame_Weather::init()");
 
-	Openweather.queryWeather("Moorenweis, DE");
+	Openweather.setAPIKey("de1d0d744c2fb068edb714ce62b12957");
+	Openweather.queryWeather("Moorenweis,DE");
 
 	_is_run = 1;
 

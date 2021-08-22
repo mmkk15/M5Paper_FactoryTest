@@ -136,13 +136,13 @@ void SysInit_Start(void)
 	pinMode(M5EPD_KEY_RIGHT_PIN, INPUT);
 	pinMode(M5EPD_KEY_PUSH_PIN, INPUT);
 	pinMode(M5EPD_KEY_LEFT_PIN, INPUT);
-	delay(100);
+	delay(500);
 
 	M5.enableEXTPower();
 	// M5.disableEPDPower();
 	// delay(500);
 	M5.enableEPDPower();
-	delay(500); // 1000
+	delay(1000);
 
 	M5.EPD.begin(M5EPD_SCK_PIN, M5EPD_MOSI_PIN, M5EPD_MISO_PIN, M5EPD_CS_PIN, M5EPD_BUSY_PIN);
 	M5.EPD.Clear(true);
@@ -235,16 +235,6 @@ void SysInit_Start(void)
 		EPDGUI_AddFrame("Frame_Home", frame_home);
 	}
 
-	log_d("done");
-
-	while (uxQueueMessagesWaiting(xQueue_Info))
-		;
-
-	if (!is_factory_test)
-	{
-		SysInit_UpdateInfo("$OK");
-	}
-
 	// Check if Wifi is configured
 	WiFi.onEvent(WiFiEventCallback);
 	if (isWiFiConfiged())
@@ -273,11 +263,21 @@ void SysInit_Start(void)
 		Syslog.Add("  Wifi is not configured ...");
 	}
 
+	log_d("done");
+
+	while (uxQueueMessagesWaiting(xQueue_Info))
+		;
+
+	if (!is_factory_test)
+	{
+		SysInit_UpdateInfo("$OK");
+	}
+
 	SysInit_UpdateInfo("System init complete.");
 
 	Syslog.Add("System init complete.");
 
-	delay(500);
+	//delay(500);
 }
 
 /***************************************************************************************/

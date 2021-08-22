@@ -36,9 +36,12 @@ public:
 
 private:
 	String	  m_ApiKey;
+	bool	  m_LocationValid;
 	S_Weather m_sWeather;
 	String	  m_WeatherString;
 
+	bool   queryCurrentWeather(String Location);
+	bool   queryDailyWeather();
 	String ConvertUnixTime(uint32_t unix_time);
 };
 
