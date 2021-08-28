@@ -15,6 +15,7 @@ public:
 	void exit();
 
 private:
+	const unsigned char *getWeatherIcon(String IconName);
 };
 
 #endif //_FRAME_OPENWEATHER_H_

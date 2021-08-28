@@ -398,7 +398,6 @@ void Frame_Main::StatusBar(m5epd_update_mode_t mode)
 	_bar->setTextDatum(CR_DATUM);
 	_bar->pushImage(498, 8, 32, 32, ImageResource_status_bar_battery_32x32);
 	uint32_t vol = M5.getBatteryVoltage();
-
 	if (vol < 3300)
 	{
 		vol = 3300;
@@ -408,6 +407,7 @@ void Frame_Main::StatusBar(m5epd_update_mode_t mode)
 		vol = 4350;
 	}
 	float battery = (float)(vol - 3300) / (float)(4350 - 3300);
+	Serial.printf("Battery voltage: %dmV\n", vol);
 	if (battery <= 0.01)
 	{
 		battery = 0.01;

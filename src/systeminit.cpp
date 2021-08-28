@@ -235,6 +235,16 @@ void SysInit_Start(void)
 		EPDGUI_AddFrame("Frame_Home", frame_home);
 	}
 
+	log_d("done");
+
+	while (uxQueueMessagesWaiting(xQueue_Info))
+		;
+
+	if (!is_factory_test)
+	{
+		SysInit_UpdateInfo("$OK");
+	}
+
 	// Check if Wifi is configured
 	WiFi.onEvent(WiFiEventCallback);
 	if (isWiFiConfiged())
@@ -263,21 +273,11 @@ void SysInit_Start(void)
 		Syslog.Add("  Wifi is not configured ...");
 	}
 
-	log_d("done");
-
-	while (uxQueueMessagesWaiting(xQueue_Info))
-		;
-
-	if (!is_factory_test)
-	{
-		SysInit_UpdateInfo("$OK");
-	}
-
-	SysInit_UpdateInfo("System init complete.");
+	SysInit_UpdateInfo("System init complete.");	
 
 	Syslog.Add("System init complete.");
 
-	//delay(500);
+	delay(500);
 }
 
 /***************************************************************************************/
